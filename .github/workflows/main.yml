@@ -1,35 +1,28 @@
-name: Сборка APK
-on:
-  push:
-    branches:
-      - main
-      - master
+name: Сборка APK из HTML
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Скачивание кода сайта
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Настройка Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: 16
 
-      - name: Install and Build APK
-        run: |
-          npm install -g @capacitor/cli @capacitor/core
-          npm install @capacitor/android
-          npx cap init TAPATEL "com.koshel0400tech.tapatel" --web-dir=.
-          npx cap add android
-          npx cap sync
-          cd android && ./gradlew assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - name: Сборка APK файла
+        uses: darkshredder/web-to-app-action@main
         with:
-          name: TAPATEL-303
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          build-folder-path: "."       # Точка означает, что index.html лежит прямо в корне
+          app-name: "TAPATEL-303"      # Ваше точное имя приложения
+          output-folder-path: "my-apks" # Папка, куда робот сохранит результат
 
-
+      - name: Сохранение готового APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: Final-APK
+          path: my-apks/
